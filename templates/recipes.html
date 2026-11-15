@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Reseptit</title>
+</head>
+
+<body>
+    <p>
+      <a href="/">Etusivulle</a>
+    </p>
+    <p>
+      <a href="/search">Hae reseptejä</a>
+    </p>
+    <p>
+      <a href="/add_recipe">Lisää resepti</a>
+    </p>
+    <p>
+      <a href="/starters">Alkuruoat</a>
+    </p>
+    <p>
+      <a href="/mains">Pääruoat</a>
+    </p>
+    <p>
+      <a href="/desserts">Jälkiruoat</a>
+    </p>
+    <ul>
+      {% for receipe in receipes %}
+      <li>{{ receipe }}</li>
+      {% endfor %}
+    </ul>
+</body>
+
+</html>

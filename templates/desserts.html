@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Jälkiruoat</title> <a href="/">Etusivulle</a> <a href="/recipes">Resepteihin</a>
+</head>
+
+<body>
+    <h1>Jälkiruoat</h1>
+
+    {% if recipes %}
+        {% for recipe in recipes %}
+            <div>
+                <h2>{{ recipe["name"] }}</h2>
+                <p>Ruokavalio: {{ recipe["diet"] }}</p>
+                <p>Ainesosat: {{ recipe["ingredients"] }}</p>
+                <p>Kommentti: {{ recipe["comment"] }}</p>
+                <p>Arvosana: {{ recipe["grade"] }}/5</p>
+                {% if session["user_id"] == recipe["user_id"] %}
+                    <a href="/edit_recipe/{{ recipe['id'] }}">Muokkaa</a>
+                    <form action="/delete_recipe/{{ recipe['id'] }}" method="post" style="display: inline"
+                          onsubmit="return confirm('Poistetaanko resepti?');">
+                    <input type="submit" value="Poista resepti" />
+                </form>
+            {% endif %}
+            </div>
+            <hr />
+        {% endfor %}
+    {% else %}
+        <p>Ei vielä jälkiruokia.</p>
+    {% endif %}
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Muokkaa reseptiä</title>
+</head>
+
+<body>
+  <p>
+    <a href="/">Etusivulle</a> <a href="/recipes">Resepteihin</a>
+  </p>
+  <h1>Muokkaa reseptiä</h1>
+  <form action="/edit_recipe/{{ recipe['id'] }}" method="post">
+    <p>
+      Reseptin nimi: <br />
+      <input type="text" name="dish_name" value="{{ recipe['name'] }}" />
+    </p>
+    <p>Ruokalaji:</p>
+    <p>
+      <input type="radio" name="dish_type" value="Alkuruoka"
+        {% if recipe["dish_type"] == "Alkuruoka" %}checked{% endif %} /> Alkuruoka
+      <input type="radio" name="dish_type" value="Pääruoka"
+        {% if recipe["dish_type"] == "Pääruoka" %}checked{% endif %} /> Pääruoka
+      <input type="radio" name="dish_type" value="Jälkiruoka"
+        {% if recipe["dish_type"] == "Jälkiruoka" %}checked{% endif %} /> Jälkiruoka
+    </p>
+    <p>Ruokavalio:</p>
+    <p>
+      <input type="checkbox" name="diet" value="Gluteeniton"
+        {% if "Gluteeniton" in recipe["diet"] %}checked{% endif %} /> Gluteeniton
+      <input type="checkbox" name="diet" value="Laktoositon"
+        {% if "Laktoositon" in recipe["diet"] %}checked{% endif %} /> Laktoositon
+      <input type="checkbox" name="diet" value="Vegaaninen"
+        {% if "Vegaaninen" in recipe["diet"] %}checked{% endif %} /> Vegaaninen
+    </p>
+    <p>
+      Ainesosat: <br />
+      <textarea name="ingredients" rows="3" cols="40">{{ recipe["ingredients"] }}</textarea>
+    </p>
+    <p>
+      Kommentti: <br />
+      <textarea name="comment" rows="3" cols="40">{{ recipe["comment"] }}</textarea>
+    </p>
+    <p>Arvosana:</p>
+    <p>
+      {% for i in range(1, 6) %}
+        <input type="radio" name="grade" value="{{ i }}"
+          {% if recipe["grade"] == i %}checked{% endif %} /> {{ i }}
+      {% endfor %}
+    </p>
+    <p>
+      <input type="submit" value="Tallenna" />
+    </p>
+  </form>
+</body>
+
+</html>

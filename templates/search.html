@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Hae reseptejä</title>
+</head>
+
+<body>
+  <p>
+    <a href="/">Etusivulle</a> <a href="/recipes">Resepteihin</a>
+  </p>
+  <h1>Hae reseptejä</h1>
+
+  <form action="/search" method="get">
+    <p>
+      Reseptin nimi: <br />
+      <input type="text" name="name" value="{{ name }}" />
+    </p>
+
+    <p>Ruokalaji:</p>
+    <p>
+      {% for t in ["Alkuruoka", "Pääruoka", "Jälkiruoka"] %}
+        <input type="checkbox" name="dish_type" value="{{ t }}"
+          {% if t in dish_types %}checked{% endif %} /> {{ t }}
+      {% endfor %}
+    </p>
+
+    <p>Ruokavalio:</p>
+    <p>
+      {% for d in ["Gluteeniton", "Laktoositon", "Vegaaninen"] %}
+        <input type="checkbox" name="diet" value="{{ d }}"
+          {% if d in diets %}checked{% endif %} /> {{ d }}
+      {% endfor %}
+    </p>
+
+    <p>Arvosana (voit valita useita):</p>
+    <p>
+      {% for i in range(1, 6) %}
+        <input type="checkbox" name="grade" value="{{ i }}"
+          {% if i in grades %}checked{% endif %} /> {{ i }}
+      {% endfor %}
+    </p>
+
+    <p>
+      Kommentissa esiintyy: <br />
+      <input type="text" name="comment" value="{{ comment }}" />
+    </p>
+
+    <p>
+      <input type="submit" value="Hae" />
+    </p>
+  </form>
+
+  {% if searched %}
+    <hr />
+    <h2>Tulokset</h2>
+    {% for recipe in results %}
+      <div>
+        <h3>{{ recipe["name"] }}</h3>
+        <p>Ruokalaji: {{ recipe["dish_type"] }}</p>
+        <p>Ruokavalio: {{ recipe["diet"] }}</p>
+        <p>Ainesosat: {{ recipe["ingredients"] }}</p>
+        <p>Kommentti: {{ recipe["comment"] }}</p>
+        <p>Arvosana: {{ recipe["grade"] }}/5</p>
+        {% if session["user_id"] == recipe["user_id"] %}
+            <a href="/edit_recipe/{{ recipe['id'] }}">Muokkaa</a>
+            <form action="/delete_recipe/{{ recipe['id'] }}" method="post" style="display: inline"
+                  onsubmit="return confirm('Poistetaanko resepti?');">
+            <input type="submit" value="Poista resepti" />
+        </form>
+    {% endif %}
+      </div>
+      <hr />
+    {% else %}
+      <p>Ei hakuehtoja vastaavia reseptejä.</p>
+    {% endfor %}
+  {% endif %}
+</body>
+
+</html>
