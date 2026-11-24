@@ -14,3 +14,11 @@ CREATE TABLE recipe (
     comment TEXT,
     grade INTEGER
 );
+
+CREATE TABLE comments (
+    id INTEGER PRIMARY KEY,
+    recipe_id INTEGER NOT NULL REFERENCES recipe(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    content TEXT NOT NULL,
+    sent_at TEXT DEFAULT CURRENT_TIMESTAMP
+);

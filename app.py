@@ -224,6 +224,53 @@ def desserts():
         ["Jälkiruoka"])
     return render_template("desserts.html", recipes=recipes)
 
+@app.route("/recipe/<int:recipe_id>")
+def show_recipe(recipe_id):
+    rows = db.query(
+        "SELECT r.id, r.user_id, r.name, r.dish_type, r.diet, r.ingredients, "
+        "r.comment, r.grade, u.username "
+        "FROM recipe r JOIN users u ON u.id = r.user_id WHERE r.id = ?",
+        [recipe_id])
+    if not rows:
+        abort(404)
+
+    comments = db.query(
+        "SELECT c.id, c.user_id, c.content, "
+        "datetime(c.sent_at, 'localtime') AS sent_at, u.username "
+        "FROM comments c JOIN users u ON u.id = c.user_id "
+        "WHERE c.recipe_id = ? ORDER BY c.id",
+        [recipe_id])
+    return render_template("recipe.html", recipe=rows[0], comments=comments)
+
+@app.route("/add_comment/<int:recipe_id>", methods=["POST"])
+def add_comment(recipe_id):
+    if "user_id" not in session:
+        abort(403)
+    if not db.query("SELECT id FROM recipe WHERE id = ?", [recipe_id]):
+        abort(404)
+
+    content = request.form["content"].strip()
+    if not content or len(content) > 1000:
+        abort(400)
+
+    db.execute(
+        "INSERT INTO comments (recipe_id, user_id, content) VALUES (?, ?, ?)",
+        [recipe_id, session["user_id"], content])
+    return redirect("/recipe/" + str(recipe_id))
+
+@app.route("/delete_comment/<int:comment_id>", methods=["POST"])
+def delete_comment(comment_id):
+    if "user_id" not in session:
+        abort(403)
+    rows = db.query("SELECT recipe_id, user_id FROM comments WHERE id = ?", [comment_id])
+    if not rows:
+        abort(404)
+    if rows[0]["user_id"] != session["user_id"]:
+        abort(403)
+
+    db.execute("DELETE FROM comments WHERE id = ?", [comment_id])
+    return redirect("/recipe/" + str(rows[0]["recipe_id"]))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

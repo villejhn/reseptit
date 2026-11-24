@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ recipe["name"] }}</title>
+</head>
+
+<body>
+    <p>
+        <a href="/">Etusivulle</a> <a href="/recipes">Resepteihin</a>
+    </p>
+
+    <h1>{{ recipe["name"] }}</h1>
+    <h3>Reseptin luoja: {{ recipe["username"] }}</h3>
+    <p>Ruokalaji: {{ recipe["dish_type"] }}</p>
+    <p>Ruokavalio: {{ recipe["diet"] }}</p>
+    <p>Ainesosat: {{ recipe["ingredients"] }}</p>
+    <p>Tekijän kommentti: {{ recipe["comment"] }}</p>
+    <p>Arvosana: {{ recipe["grade"] }}/5</p>
+
+    {% if session["user_id"] == recipe["user_id"] %}
+        <a href="/edit_recipe/{{ recipe['id'] }}">Muokkaa</a>
+        <form action="/delete_recipe/{{ recipe['id'] }}" method="post" style="display: inline"
+              onsubmit="return confirm('Poistetaanko resepti?');">
+            <input type="submit" value="Poista resepti" />
+        </form>
+    {% endif %}
+
+    <hr />
+    <h2>Keskustelu</h2>
+
+    {% for c in comments %}
+        <div>
+            <p><strong>{{ c["username"] }}</strong> ({{ c["sent_at"] }})</p>
+            <p style="white-space: pre-line">{{ c["content"] }}</p>
+            {% if session["user_id"] == c["user_id"] %}
+                <form action="/delete_comment/{{ c['id'] }}" method="post"
+                      onsubmit="return confirm('Poistetaanko kommentti?');">
+                    <input type="submit" value="Poista kommentti" />
+                </form>
+            {% endif %}
+        </div>
+        <hr />
+    {% else %}
+        <p>Ei vielä kommentteja.</p>
+    {% endfor %}
+
+    {% if session["user_id"] %}
+        <form action="/add_comment/{{ recipe['id'] }}" method="post">
+            <p>
+                Uusi kommentti: <br />
+                <textarea name="content" rows="4" cols="50" maxlength="1000" required></textarea>
+            </p>
+            <input type="submit" value="Lähetä kommentti" />
+        </form>
+    {% else %}
+        <p>Kirjaudu sisään kommentoidaksesi.</p>
+    {% endif %}
+</body>
+
+</html>

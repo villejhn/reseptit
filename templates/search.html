@@ -61,7 +61,7 @@
     <h2>Tulokset</h2>
     {% for recipe in results %}
       <div>
-        <h3>{{ recipe["name"] }}</h3>
+        <h3><a href="/recipe/{{ recipe['id'] }}">{{ recipe["name"] }}</a></h3>
         <h4>Reseptin tekijä: {{ recipe["username"] }}</h4>
         <p>Ruokalaji: {{ recipe["dish_type"] }}</p>
         <p>Ruokavalio: {{ recipe["diet"] }}</p>
