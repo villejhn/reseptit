@@ -17,6 +17,11 @@
       <input type="text" name="name" value="{{ name }}" />
     </p>
 
+    <p>
+      Reseptin tekijä: <br />
+      <input type="text" name="author" value="{{ author }}" />
+    </p>
+
     <p>Ruokalaji:</p>
     <p>
       {% for t in ["Alkuruoka", "Pääruoka", "Jälkiruoka"] %}
@@ -57,6 +62,7 @@
     {% for recipe in results %}
       <div>
         <h3>{{ recipe["name"] }}</h3>
+        <h4>Reseptin tekijä: {{ recipe["username"] }}</h4>
         <p>Ruokalaji: {{ recipe["dish_type"] }}</p>
         <p>Ruokavalio: {{ recipe["diet"] }}</p>
         <p>Ainesosat: {{ recipe["ingredients"] }}</p>

@@ -141,6 +141,7 @@ DIETS = ("Gluteeniton", "Laktoositon", "Vegaaninen")
 
 @app.route("/search")
 def search():
+    author = request.args.get("author", "").strip()
     name = request.args.get("name", "").strip()
     comment = request.args.get("comment", "").strip()
     dish_types = [d for d in request.args.getlist("dish_type") if d in DISH_TYPES]
@@ -151,36 +152,41 @@ def search():
     results = []
 
     if searched:
-        sql = ("SELECT id, user_id, name, dish_type, diet, ingredients, comment, grade "
-               "FROM recipe WHERE 1 = 1")
+        sql = ("SELECT r.id, r.user_id, r.name, r.dish_type, r.diet, r.ingredients, "
+                "r.comment, r.grade, u.username "
+                "FROM recipe r JOIN users u ON u.id = r.user_id WHERE 1 = 1")
         params = []
 
+        if author:
+            sql += " AND py_lower(u.username) LIKE ?"
+            params.append("%" + author.lower() + "%")
+
         if name:
-            sql += " AND py_lower(name) LIKE ?"
+            sql += " AND py_lower(r.name) LIKE ?"
             params.append("%" + name.lower() + "%")
 
         if comment:
-            sql += " AND py_lower(comment) LIKE ?"
+            sql += " AND py_lower(r.comment) LIKE ?"
             params.append("%" + comment.lower() + "%")
 
         if dish_types:
-            sql += " AND dish_type IN (" + ", ".join("?" * len(dish_types)) + ")"
+            sql += " AND r.dish_type IN (" + ", ".join("?" * len(dish_types)) + ")"
             params += dish_types
 
         if grades:
-            sql += " AND grade IN (" + ", ".join("?" * len(grades)) + ")"
+            sql += " AND r.grade IN (" + ", ".join("?" * len(grades)) + ")"
             params += grades
 
         for diet in diets:
-            sql += " AND diet LIKE ?"
+            sql += " AND r.diet LIKE ?"
             params.append("%" + diet + "%")
 
-        sql += " ORDER BY name"
+        sql += " ORDER BY r.name"
         results = db.query(sql, params)
 
     return render_template("search.html", results=results, searched=searched,
                            name=name, comment=comment, dish_types=dish_types,
-                           diets=diets, grades=grades)
+                           author=author, diets=diets, grades=grades)
 
 @app.route("/delete_recipe/<int:recipe_id>", methods=["POST"])
 def delete_recipe(recipe_id):
@@ -191,24 +197,30 @@ def delete_recipe(recipe_id):
 @app.route("/starters")
 def starters():
     recipes = db.query(
-        "SELECT id, user_id, name, diet, ingredients, comment, grade "
-        "FROM recipe WHERE dish_type = ? ORDER BY name",
+        "SELECT r.id, r.user_id, r.name, r.diet, r.ingredients, r.comment, r.grade, "
+        "u.username "
+        "FROM recipe r JOIN users u ON u.id = r.user_id "
+        "WHERE r.dish_type = ? ORDER BY r.name",
         ["Alkuruoka"])
     return render_template("starters.html", recipes=recipes)
 
 @app.route("/mains")
 def mains():
     recipes = db.query(
-        "SELECT id, name, diet, ingredients, comment, grade "
-        "FROM recipe WHERE dish_type = ? ORDER BY name",
+        "SELECT r.id, r.user_id, r.name, r.diet, r.ingredients, r.comment, r.grade, "
+        "u.username "
+        "FROM recipe r JOIN users u ON u.id = r.user_id "
+        "WHERE r.dish_type = ? ORDER BY r.name",
         ["Pääruoka"])
     return render_template("mains.html", recipes=recipes)
 
 @app.route("/desserts")
 def desserts():
     recipes = db.query(
-        "SELECT id, name, diet, ingredients, comment, grade "
-        "FROM recipe WHERE dish_type = ? ORDER BY name",
+        "SELECT r.id, r.user_id, r.name, r.diet, r.ingredients, r.comment, r.grade, "
+        "u.username "
+        "FROM recipe r JOIN users u ON u.id = r.user_id "
+        "WHERE r.dish_type = ? ORDER BY r.name",
         ["Jälkiruoka"])
     return render_template("desserts.html", recipes=recipes)
 

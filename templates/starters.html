@@ -12,6 +12,7 @@
         {% for recipe in recipes %}
             <div>
                 <h2>{{ recipe["name"] }}</h2>
+                <h3>Reseptin tekijä: {{ recipe["username"] }}</h3>
                 <p>Ruokavalio: {{ recipe["diet"] }}</p>
                 <p>Ainesosat: {{ recipe["ingredients"] }}</p>
                 <p>Kommentti: {{ recipe["comment"] }}</p>
